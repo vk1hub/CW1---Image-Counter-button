@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: _themeMode,
       home: MyHomePage(
-        title: 'Image toggle and Counter button',
+        title: 'Image & Counter App',
         changeTheme: _setTheme,
       ),
       debugShowCheckedModeBanner: false,
@@ -71,6 +71,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  bool currentImageState = true;
+
+  // Toggle Image Function
+  void _toggleImage() {
+    setState(() {
+      currentImageState = !currentImageState;
+    });
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -100,6 +108,32 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // Showing image Widget
+            Builder(
+              builder: (context) {
+                String image;
+                if (currentImageState) {
+                  image = 'assets/image1.png';
+                } else {
+                  image = 'assets/image2.png';
+                }
+                return Image.asset(
+                  image,
+                  width: 300,
+                  height: 300,
+                );
+              },
+            ),
+
+            const SizedBox(height: 40),
+
+            ElevatedButton(
+              onPressed: _toggleImage,
+              child: const Text('Toggle Image'),
+            ),
+
+            const SizedBox(height: 40),
+
             const Text('You have pushed the button this many times:'),
             Text(
               '$_counter',
