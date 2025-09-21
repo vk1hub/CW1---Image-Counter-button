@@ -33,9 +33,7 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
         ),
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.black),
-        ),
+        textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
       ),
       // -------------- DARK THEME
       darkTheme: ThemeData(
@@ -45,15 +43,10 @@ class _MyAppState extends State<MyApp> {
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
         ),
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.white),
-        ),
+        textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
       ),
       themeMode: _themeMode,
-      home: MyHomePage(
-        title: 'Image & Counter App',
-        changeTheme: _setTheme,
-      ),
+      home: MyHomePage(title: 'Image & Counter App', changeTheme: _setTheme),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -61,7 +54,7 @@ class _MyAppState extends State<MyApp> {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title, required this.changeTheme});
-  
+
   final String title;
   final void Function(ThemeMode) changeTheme;
 
@@ -69,15 +62,38 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   int _counter = 0;
   bool currentImageState = true;
 
+  // Creating animation controller
+  late AnimationController _controller;
+  late Animation<double> _curvedAnimation;
+
+  // creating init state
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+    _curvedAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+
+    _controller.value = 1;
+  }
+
   // Toggle Image Function
-  void _toggleImage() {
+  void _toggleImage() async {
+    await _controller.reverse();
     setState(() {
       currentImageState = !currentImageState;
     });
+    _controller.forward();
   }
 
   void _incrementCounter() {
@@ -90,7 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
         title: Text(widget.title),
 
         actions: [
@@ -108,21 +123,21 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Showing image Widget
-            Builder(
-              builder: (context) {
-                String image;
-                if (currentImageState) {
-                  image = 'assets/image1.png';
-                } else {
-                  image = 'assets/image2.png';
-                }
-                return Image.asset(
-                  image,
-                  width: 300,
-                  height: 300,
-                );
-              },
+            FadeTransition(
+              // fade transition
+              opacity: _curvedAnimation,
+              // Showing image Widget
+              child: Builder(
+                builder: (context) {
+                  String image;
+                  if (currentImageState) {
+                    image = 'assets/image1.png';
+                  } else {
+                    image = 'assets/image2.png';
+                  }
+                  return Image.asset(image, width: 300, height: 300);
+                },
+              ),
             ),
 
             const SizedBox(height: 40),
